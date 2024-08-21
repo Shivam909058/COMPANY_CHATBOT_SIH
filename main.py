@@ -6,14 +6,10 @@ from langchain_openai import OpenAI
 import streamlit as st
 import os
 from dotenv import load_dotenv
-
-# Load environment variables
 load_dotenv()
-
-# Set the OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Streamlit app
+# apni comapny register kar le bhai
 def main():
     st.title("Employee Query Chatbot")
 
@@ -46,7 +42,6 @@ def main():
         user_query = st.text_input("What would you like to know?")
 
         if st.button("Submit"):
-            # Prepare the documents for embedding
             documents = [
                 st.session_state.company_data["hr_policies"],
                 st.session_state.company_data["it_support"],
@@ -58,15 +53,11 @@ def main():
                 {"company": company_name, "section": "Company Events"}
             ]
 
-            # Create embeddings and vector store
+            
             embeddings = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
             vector_store = Chroma.from_texts(documents, embeddings, metadatas=metadata)
-
-            # Initialize the LLM and QA chain
             llm = OpenAI(temperature=0.7)
             qa_chain = RetrievalQA.from_chain_type(llm, chain_type="stuff", retriever=vector_store.as_retriever())
-
-            # Run the query through the QA chain using invoke
             response = qa_chain.invoke({"query": user_query})
             st.write(response["output"])
 
